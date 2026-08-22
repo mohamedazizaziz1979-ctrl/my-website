@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive English Exam - Unit 1</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --success: #10b981;
+            --error: #ef4444;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-sub: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            padding: 30px 15px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .exam-container {
+            width: 100%;
+            max-width: 850px;
+        }
+
+        /* Top Header & Progress Bar */
+        .sticky-header {
+            position: sticky;
+            top: 15px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            padding: 15px 25px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .exam-title h2 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .exam-title p {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+        }
+
+        .score-badge {
+            background: var(--primary);
+            color: white;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        /* Question Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--bg);
+        }
+
+        .card-header h3 {
+            font-size: 1.1rem;
+            color: var(--text-main);
+            font-weight: 700;
+        }
+
+        .marks-tag {
+            background: #e0e7ff;
+            color: #3730a3;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 8px;
+        }
+
+        /* Interactive Inputs */
+        input[type="text"], textarea {
+            font-family: inherit;
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 2px solid var(--border);
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s;
+            margin-top: 6px;
+            background: #fafafa;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            border-color: var(--primary);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .inline-input {
+            width: 180px !important;
+            display: inline-block;
+            padding: 6px 12px !important;
+            margin: 0 5px;
+        }
+
+        /* Choice Buttons Grid */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .option-btn {
+            background: var(--bg);
+            border: 2px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-main);
+            text-align: left;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary);
+            background: #e0e7ff;
+        }
+
+        .option-btn.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .word-bank {
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .reading-box {
+            background: var(--bg);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+            line-height: 1.8;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        .dialogue-row {
+            margin-bottom: 12px;
+        }
+
+        .speaker {
+            font-weight: 700;
+            color: var(--primary);
+            margin-right: 8px;
+        }
+
+        /* Submit Section */
+        .submit-btn {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .submit-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Correction Styles */
+        .correct-bg {
+            background-color: #d1fae5 !important;
+            border-color: var(--success) !important;
+            color: #065f46 !important;
+        }
+
+        .wrong-bg {
+            background-color: #fee2e2 !important;
+            border-color: var(--error) !important;
+            color: #991b1b !important;
+        }
+
+        .feedback-text {
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-top: 4px;
+            display: block;
+        }
+        .feedback-text.correct { color: var(--success); }
+        .feedback-text.wrong { color: var(--error); }
+    </style>
+</head>
+<body>
+
+<div class="exam-container">
+
+    <!-- Header -->
+    <div class="sticky-header">
+        <div class="exam-title">
+            <h2>General Test - Unit 1</h2>
+            <p>Grade 9 (Prep 3) • Interactive Platform</p>
+        </div>
+        <div class="score-badge" id="scoreDisplay">Score: -- / 20</div>
+    </div>
+
+    <form id="examForm">
+
+        <!-- Q1: Dialogue -->
+        <div class="card">
+            <div class="card-header">
+                <h3>1. Complete the Dialogue</h3>
+                <span class="marks-tag">5 Marks</span>
+            </div>
+            <p style="color: var(--text-sub); margin-bottom: 15px;">Two students are talking about self-discovery:</p>
+            
+            <div class="dialogue-row"><span class="speaker">Ahmed:</span> How would you describe your identity?</div>
+            <div class="dialogue-row"><span class="speaker">Shereen:</span> Identity is your values, personality and dreams.</div>
+            
+            <div class="dialogue-row">
+                <span class="speaker">Ahmed (1):</span>
+                <input type="text" data-answer="what changed your mind|how did you realize that|why" placeholder="Type Ahmed's question...">
+            </div>
+
+            <div class="dialogue-row"><span class="speaker">Shereen:</span> I thought being quiet was weak, but now it is my strength.</div>
+
+            <div class="dialogue-row"><span class="speaker">Ahmed:</span> What influenced your growth the most?</div>
+            <div class="dialogue-row">
+                <span class="speaker">Shereen (2):</span>
+                <input type="text" data-answer="my experience|challenges|learning" placeholder="Type Shereen's response...">
+            </div>
+
+            <div class="dialogue-row">
+                <span class="speaker">Ahmed (3):</span>
+                <input type="text" data-answer="what does being real mean|what do you mean" placeholder="Type Ahmed's question...">
+            </div>
+            <div class="dialogue-row"><span class="speaker">Shereen:</span> Being real means showing who I really am.</div>
+
+            <div class="dialogue-row">
+                <span class="speaker">Ahmed (4):</span>
+                <input type="text" data-answer="what is your advice|what advice" placeholder="Type Ahmed's question...">
+            </div>
+            <div class="dialogue-row"><span class="speaker">Shereen:</span> Be patient with yourself.</div>
+
+            <div class="dialogue-row">
+                <span class="speaker">Ahmed (5):</span>
+                <input type="text" data-answer="thank you|great advice|i agree" placeholder="Type Ahmed's response...">
+            </div>
+        </div>
+
+        <!-- Q2: Fill in the Blanks -->
+        <div class="card">
+            <div class="card-header">
+                <h3>2. Complete the Text</h3>
+                <span class="marks-tag">4 Marks</span>
+            </div>
+            <div class="word-bank">
+                has saved • doctor • hospital • patients • Aswan • has been saved
+            </div>
+            <p style="line-height: 2.2;">
+                Dr. Magdi Yacoub is a famous 
+                <input type="text" class="inline-input" data-answer="doctor" placeholder="(1)">
+                from Egypt. He worked for many years in London and helped thousands of 
+                <input type="text" class="inline-input" data-answer="patients" placeholder="(2)">.
+                He has built a special center for children in 
+                <input type="text" class="inline-input" data-answer="Aswan" placeholder="(3)">.
+                Many people love him because he 
+                <input type="text" class="inline-input" data-answer="has saved" placeholder="(4)">
+                lives and given hope to families.
+            </p>
+        </div>
+
+        <!-- Q3: Reading Comprehension -->
+        <div class="card">
+            <div class="card-header">
+                <h3>3. Reading Comprehension</h3>
+                <span class="marks-tag">3 Marks</span>
+            </div>
+            <div class="reading-box">
+                On the first day of Grade 9, Nour stood nervously in front of the mirror, fixing her blazer again and again. She felt different from her classmates and kept silent during the lessons. Her only comfort was her sketchbook, where she loved to draw. Drawing made her feel calm and safe.<br><br>
+                One afternoon, her teacher asked the class to design an <strong>Identity Map</strong>. Nour decided to draw herself, her family, her values, and her dream. When she presented it, the class clapped loudly. She learned that being different was her true strength.
+            </div>
+
+            <p><strong>1. The main idea of the text is:</strong></p>
+            <div class="options-grid" data-q="q3_1" data-correct="Strength in difference">
+                <button type="button" class="option-btn">First day</button>
+                <button type="button" class="option-btn">Teacher's task</button>
+                <button type="button" class="option-btn">Strength in difference</button>
+                <button type="button" class="option-btn">New blazer</button>
+            </div>
+
+            <p style="margin-top: 15px;"><strong>2. The teacher asked students to:</strong></p>
+            <div class="options-grid" data-q="q3_2" data-correct="Design Identity Map">
+                <button type="button" class="option-btn">Write story</button>
+                <button type="button" class="option-btn">Draw map</button>
+                <button type="button" class="option-btn">Design Identity Map</button>
+                <button type="button" class="option-btn">Paint city</button>
+            </div>
+        </div>
+
+        <!-- Q4: Multiple Choice (Vocabulary) -->
+        <div class="card">
+            <div class="card-header">
+                <h3>4. Vocabulary & Choice</h3>
+                <span class="marks-tag">4 Marks</span>
+            </div>
+
+            <p><strong>1. The word "individuality" means:</strong></p>
+            <div class="options-grid" data-q="q4_1" data-correct="uniqueness">
+                <button type="button" class="option-btn">weakness</button>
+                <button type="button" class="option-btn">uniqueness</button>
+                <button type="button" class="option-btn">sadness</button>
+                <button type="button" class="option-btn">mistake</button>
+            </div>
+
+            <p style="margin-top: 15px;"><strong>2. The antonym of "confidence" is:</strong></p>
+            <div class="options-grid" data-q="q4_2" data-correct="fear">
+                <button type="button" class="option-btn">courage</button>
+                <button type="button" class="option-btn">strength</button>
+                <button type="button" class="option-btn">fear</button>
+                <button type="button" class="option-btn">respect</button>
+            </div>
+
+            <p style="margin-top: 15px;"><strong>3. The prefix "self-" in "self-discovery" means:</strong></p>
+            <div class="options-grid" data-q="q4_3" data-correct="personal">
+                <button type="button" class="option-btn">others</button>
+                <button type="button" class="option-btn">personal</button>
+                <button type="button" class="option-btn">shared</button>
+                <button type="button" class="option-btn">free</button>
+            </div>
+
+            <p style="margin-top: 15px;"><strong>4. The word "strength" means:</strong></p>
+            <div class="options-grid" data-q="q4_4" data-correct="power">
+                <button type="button" class="option-btn">power</button>
+                <button type="button" class="option-btn">fear</button>
+                <button type="button" class="option-btn">sadness</button>
+                <button type="button" class="option-btn">kindness</button>
+            </div>
+        </div>
+
+        <!-- Q5: Grammar Corrections -->
+        <div class="card">
+            <div class="card-header">
+                <h3>5. Grammar Corrections</h3>
+                <span class="marks-tag">2 Marks</span>
+            </div>
+            <p style="margin-bottom: 12px;">
+                1. Leila has (learn) 
+                <input type="text" class="inline-input" data-answer="learned|learnt" placeholder="Correct word"> 
+                a lot about her identity this year.
+            </p>
+            <p>
+                2. Many students (have) 
+                <input type="text" class="inline-input" data-answer="have been" placeholder="Correct word"> 
+                helped by supportive teachers.
+            </p>
+        </div>
+
+        <!-- Q6: Writing Essay -->
+        <div class="card">
+            <div class="card-header">
+                <h3>6. Paragraph Writing</h3>
+                <span class="marks-tag">2 Marks</span>
+            </div>
+            <p style="margin-bottom: 10px; font-weight: 600; color: var(--primary);">Topic: "How values shape identity"</p>
+            <textarea rows="5" placeholder="Write your paragraph here (around 100 words)..."></textarea>
+        </div>
+
+        <button type="button" class="submit-btn" id="submitBtn">Submit Exam & Check Results</button>
+    </form>
+</div>
+
+<script>
+    // Handle Option Selecting
+    document.querySelectorAll('.options-grid').forEach(grid => {
+        const buttons = grid.querySelectorAll('.option-btn');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                buttons.forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+            });
+        });
+    });
+
+    // Auto Correction Engine
+    document.getElementById('submitBtn').addEventListener('click', () => {
+        let score = 0;
+        let total = 0;
+
+        // Check Text Inputs
+        const textInputs = document.querySelectorAll('input[data-answer]');
+        textInputs.forEach(input => {
+            total++;
+            const userAns = input.value.trim().toLowerCase();
+            const allowedAnswers = input.getAttribute('data-answer').toLowerCase().split('|');
+
+            // Remove previous indicators
+            const parent = input.parentElement;
+            const oldFb = parent.querySelector('.feedback-text');
+            if (oldFb) oldFb.remove();
+
+            const isCorrect = allowedAnswers.some(ans => userAns.includes(ans) && userAns.length > 0);
+
+            if (isCorrect) {
+                score++;
+                input.classList.remove('wrong-bg');
+                input.classList.add('correct-bg');
+            } else {
+                input.classList.remove('correct-bg');
+                input.classList.add('wrong-bg');
+                
+                const fb = document.createElement('span');
+                fb.className = 'feedback-text wrong';
+                fb.textContent = `Expected: ${allowedAnswers[0]}`;
+                parent.appendChild(fb);
+            }
+        });
+
+        // Check Multiple Choice Questions
+        const choiceGrids = document.querySelectorAll('.options-grid[data-correct]');
+        choiceGrids.forEach(grid => {
+            total++;
+            const correctOption = grid.getAttribute('data-correct');
+            const selectedBtn = grid.querySelector('.option-btn.selected');
+
+            grid.querySelectorAll('.option-btn').forEach(btn => {
+                btn.disabled = true; // Lock after submit
+                if (btn.textContent.trim() === correctOption) {
+                    btn.classList.add('correct-bg');
+                }
+            });
+
+            if (selectedBtn && selectedBtn.textContent.trim() === correctOption) {
+                score++;
+            } else if (selectedBtn) {
+                selectedBtn.classList.add('wrong-bg');
+            }
+        });
+
+        // Display Score
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        scoreDisplay.textContent = `Score: ${score} / ${total}`;
+        scoreDisplay.style.background = score >= total * 0.7 ? '#10b981' : '#ef4444';
+
+        // Scroll to Top smoothly
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+</script>
+
+</body>
+</html>
